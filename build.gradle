@@ -1,0 +1,58 @@
+
+
+repositories {
+    maven {
+        url "https://plugins.gradle.org/m2"
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2"
+        }
+    }
+    ext{
+        serenityVersion = '3.2.5'
+        serenityCucumberVersion = '3.2.5'
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:${serenityVersion}")
+        classpath("net.serenity-bdd:serenity-single-page-report:${serenityCucumberVersion}")
+
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'net.serenity-bdd.aggregator'
+apply plugin: "net.serenity-bdd.serenity-gradle-plugin"
+
+dependencies {
+    testImplementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityVersion"
+    testImplementation "net.serenity-bdd:serenity-junit:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-cucumber:$rootProject.ext.serenityCucumberVersion"
+    implementation "net.serenity-bdd:serenity-screenplay-rest:$rootProject.ext.serenityVersion"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.assertj:assertj-core:3.20.2'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.0-alpha4'
+}
+serenity {
+    reports = ["single-page-html"]
+}
+wrapper {
+    gradleVersion = "7.4.2"
+}
+test {
+    systemProperty "file.encoding", "ISO-8859-1"
+    enableAssertions = true
+    systemProperty 'tags', System.getProperty('tags', '')
+    systemProperty 'environment', System.getProperty('environment', '')
+}
+gradle.startParameter.continueOnFailure = true
+test.finalizedBy(aggregate)
